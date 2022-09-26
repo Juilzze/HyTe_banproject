@@ -272,7 +272,6 @@ def ban_user():
     print(username_info)
     print(time_info)
     print(reason_info)
-
     
     namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
     mycursor.execute(namecheck)
@@ -295,7 +294,29 @@ def ban_user():
         #Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
 
 def warn_user():
-    print("test")
+    nextstep = False
+    username_info = username_warn_entry.get()
+    reason_info = warn_reason_entry.get()
+    print(username_info)
+    print(reason_info)
+    
+    namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
+    mycursor.execute(namecheck)
+    myresult = mycursor.fetchall()
+    print(myresult)
+    for x in myresult:
+        if username_info in x:
+            Label(warn_screen, text=f"User: {username_info} has been warned", fg="red", font=("calibri", 11)).pack()
+            nextstep = True
+            
+    if nextstep == True:
+        today = date.today()
+        print(time_info)
+        print(today)
+        sql = f"INSERT INTO warns (username, reason, date) VALUES ('{username_info}', '{reason_info}', '{today}')"
+        print(sql)
+        mycursor.execute(sql)
+        #Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
 
 def main_account_screen():
     global main_screen
