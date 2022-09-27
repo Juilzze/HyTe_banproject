@@ -1,4 +1,10 @@
 import mysql.connector
+from tkinter import *
+from datetime import date, datetime, timedelta
+
+##
+## Connecting Python to MySQL server
+##
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
@@ -10,8 +16,9 @@ mydb = mysql.connector.connect(
 mydb.autocommit = True
 mycursor = mydb.cursor()
 
-from tkinter import *
-from datetime import date, datetime, timedelta
+##
+## User register screen (Tkinter) and functions
+##
 
 def register():
     global register_screen
@@ -52,6 +59,36 @@ def register():
 register_user).pack()
 
 
+def register_user():
+    nextstep = False
+    username_info = username.get()
+    password_info = password.get()
+    key_info = key.get()
+    admincheck_info = admincheck.get()
+
+    namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
+    mycursor.execute(namecheck)
+    myresult = mycursor.fetchall()
+    for x in myresult:
+        if username_info in x:
+            Label(register_screen, text=f"There is already user: {username_info}", fg="red", font=("calibri", 11)).pack()
+
+    for x in myresult:
+        if username_info not in x:
+            nextstep = True
+            
+    if nextstep == True or not myresult:
+        if key_info == "123":
+            sql = f"INSERT INTO users (username, pass, admin) VALUES ('{username_info}', '{password_info}', {admincheck_info})"
+            mycursor.execute(sql)
+            Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+            
+
+##
+## User login screen (Tkinter) and functions
+##
+
+
 def login():
     global login_screen
     login_screen = Toplevel(main_screen)
@@ -78,37 +115,6 @@ def login():
     password_login_entry.pack()
     Label(login_screen, text="").pack()
     Button(login_screen, text="Login", width=10, height=1, command = login_verify).pack()
-    
-
-def register_user():
-    nextstep = False
-    username_info = username.get()
-    password_info = password.get()
-    key_info = key.get()
-    admincheck_info = admincheck.get()
-    print(username_info)
-
-    namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
-    mycursor.execute(namecheck)
-    myresult = mycursor.fetchall()
-    print(myresult)
-    for x in myresult:
-        if username_info in x:
-            Label(register_screen, text=f"There is already user: {username_info}", fg="red", font=("calibri", 11)).pack()
-
-    for x in myresult:
-        print(x)
-        if username_info not in x:
-            nextstep = True
-            print("test")
-            
-    if nextstep == True or not myresult:
-        if key_info == "123":
-            print(username_info, password_info, admincheck_info)
-            sql = f"INSERT INTO users (username, pass, admin) VALUES ('{username_info}', '{password_info}', {admincheck_info})"
-            mycursor.execute(sql)
-            Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
-            
 
 def login_verify():
     username1 = username_verify.get()
@@ -117,7 +123,6 @@ def login_verify():
     password_login_entry.delete(0, END)
     namecheck = (f"SELECT username FROM users WHERE users.username = '{username1}'")
     passcheck = (f"SELECT pass FROM users WHERE users.username = '{username1}'")
-    print(namecheck)
     mycursor.execute(namecheck)
     myresult = mycursor.fetchall()
     mycursor.execute(passcheck)
@@ -136,6 +141,10 @@ def login_verify():
         login_sucess()
         Label(login_screen, text="Login success", fg="green", font=("calibri", 11)).pack()
         main_screen.destroy()
+        isadmin = False
+        admincheck = (f"SELECT admin FROM users WHERE users.username = '{username1}'")
+        mycursor.execute(admincheck)
+        myresult3 = mycursor.fetchall()
         admin_view()
     elif logincode1 != True or logincode2 != True:
         Label(login_screen, text="Login failed", fg="red", font=("calibri", 11)).pack()
@@ -152,6 +161,12 @@ def login_sucess():
 def delete_login_success():
     login_success_screen.destroy()
 
+
+##
+## Tkinter screens
+##
+
+    
 def user_view():
     global user_view
     user_view = Tk()
@@ -269,14 +284,10 @@ def ban_user():
     username_info = username_ban_entry.get()
     time_info = int(ban_time_entry.get())
     reason_info = ban_reason_entry.get()
-    print(username_info)
-    print(time_info)
-    print(reason_info)
     
     namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
     mycursor.execute(namecheck)
     myresult = mycursor.fetchall()
-    print(myresult)
     for x in myresult:
         if username_info in x:
             Label(ban_screen, text=f"User: {username_info} has been banned", fg="red", font=("calibri", 11)).pack()
@@ -284,12 +295,8 @@ def ban_user():
             
     if nextstep == True:
         today = date.today()
-        print(time_info)
         enddate = today + timedelta(days=int(time_info))
-        print(today)
-        print(enddate)
         sql = f"INSERT INTO bans (username, reason, date, enddate) VALUES ('{username_info}', '{reason_info}', '{today}', '{enddate}')"
-        print(sql)
         mycursor.execute(sql)
         #Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
 
@@ -297,13 +304,10 @@ def warn_user():
     nextstep = False
     username_info = username_warn_entry.get()
     reason_info = warn_reason_entry.get()
-    print(username_info)
-    print(reason_info)
     
     namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
     mycursor.execute(namecheck)
     myresult = mycursor.fetchall()
-    print(myresult)
     for x in myresult:
         if username_info in x:
             Label(warn_screen, text=f"User: {username_info} has been warned", fg="red", font=("calibri", 11)).pack()
@@ -311,8 +315,6 @@ def warn_user():
             
     if nextstep == True:
         today = date.today()
-        print(time_info)
-        print(today)
         sql = f"INSERT INTO warns (username, reason, date) VALUES ('{username_info}', '{reason_info}', '{today}')"
         print(sql)
         mycursor.execute(sql)
@@ -328,6 +330,5 @@ def main_account_screen():
     Button(text="Login", height="2", width="30", command = login).pack()
     Label(text="").pack()
     Button(text="Register", height="2", width="30", command=register).pack()
-
 
 main_account_screen()
