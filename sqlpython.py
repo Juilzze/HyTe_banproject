@@ -1,6 +1,7 @@
 import mysql.connector
 from tkinter import *
 from datetime import date, datetime, timedelta
+from tkinter.ttk import Combobox
 
 ##
 ## Connecting Python to MySQL server
@@ -121,23 +122,16 @@ def login_verify():
     password1 = password_verify.get()
     username_login_entry.delete(0, END)
     password_login_entry.delete(0, END)
-    namecheck = (f"SELECT username FROM users WHERE users.username = '{username1}'")
-    passcheck = (f"SELECT pass FROM users WHERE users.username = '{username1}'")
-    mycursor.execute(namecheck)
+    logincheck = (f"SELECT username FROM users WHERE users.username = '{username1}' and users.pass = '{password1}'")
+    mycursor.execute(logincheck)
     myresult = mycursor.fetchall()
-    mycursor.execute(passcheck)
-    myresult2 = mycursor.fetchall()
-    logincode1 = False
-    logincode2 = False
+    loginverify = False
 
     for x in myresult:
         if username1 in x:
-            logincode1 = True
-    for x in myresult2:
-        if password1 in x:
-            logincode2 = True
+            loginverify = True
 
-    if logincode1 == True and logincode2 == True:
+    if loginverify == True:
         login_sucess()
         Label(login_screen, text="Login success", fg="green", font=("calibri", 11)).pack()
         main_screen.destroy()
@@ -232,16 +226,31 @@ def ban_screen():
     global username_ban
     global ban_time
     global ban_reason
+    global selected_text
+    global cb
+    global var
+    global lb
+    var = StringVar()
     username_ban = StringVar()
     ban_time = IntVar()
     ban_reason = StringVar()
+    selected_text = StringVar()
     global username_ban_entry
     global ban_time_entry
     global ban_reason_entry
+    allusers = (f"SELECT users.username FROM users")
+    mycursor.execute(allusers)
+    myresult = mycursor.fetchall()
 
     Label(ban_screen, text="Username * ").pack()
-    username_ban_entry = Entry(ban_screen, textvariable=username_ban)
-    username_ban_entry.pack()
+
+    data=(myresult)
+    cb=Combobox(ban_screen, values=data, textvariable=var).pack()
+
+    lb=Listbox(ban_screen, height=5, selectmode='multiple')
+    for num in data:
+        lb.insert(END,num)
+
     Label(ban_screen, text="").pack()
     Label(ban_screen, text="Time (days) *").pack()
     ban_time_entry = Entry(ban_screen, textvariable=ban_time)
@@ -251,7 +260,12 @@ def ban_screen():
     ban_reason_entry = Entry(ban_screen, textvariable=ban_reason)
     ban_reason_entry.pack()
     Label(ban_screen, text="").pack()
-    Button(ban_screen, text="Ban", width=10, height=1, command = ban_user).pack()
+    Button(ban_screen, text="Ban", width=10, height=1, command = selected_item).pack()
+
+def selected_item():
+    print(var.get())
+    print(lb.get())
+    print(cb.get())
 
 def warn_screen():
     global warn_screen
