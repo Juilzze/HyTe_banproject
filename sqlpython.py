@@ -18,7 +18,7 @@ mydb.autocommit = True
 mycursor = mydb.cursor()
 
 ##
-## User register screen (Tkinter) and functions
+## Register screen
 ##
 
 def register():
@@ -60,7 +60,10 @@ def register():
     Button(register_screen, text="Register", width=10, height=1, command = 
 register_user).pack()
 
-
+##
+## Register function
+##
+    
 def register_user():
     nextstep = False
     username_info = username.get()
@@ -94,7 +97,7 @@ def register_user():
             
 
 ##
-## User login screen (Tkinter) and functions
+## User login screen
 ##
 
 
@@ -125,6 +128,10 @@ def login():
     password_login_entry.pack()
     Label(login_screen, text="").pack()
     Button(login_screen, text="Login", width=10, height=1, command = login_verify).pack()
+    
+##
+## Login function
+##
 
 def login_verify():
     username1 = username_verify.get()
@@ -155,7 +162,7 @@ def login_verify():
 
 
 ##
-## Tkinter screens
+## User and admin windows
 ##
 
     
@@ -187,7 +194,10 @@ def admin_view():
     Label(text="").pack()
     Button(text="Give ban", height="2", width="30", command=ban_screen).pack()
 
-
+##
+## Ban and warn lists
+##
+    
 def banlist():
     banlist = Tk()
     banlist.state('zoomed')
@@ -216,6 +226,9 @@ def warnlist():
             e.insert(END, warns[j])
         i=i+1
 
+##
+## Ban screen
+##
 
 def ban_screen():
     global ban_screen
@@ -262,6 +275,10 @@ def ban_screen():
     ban_reason_entry.pack()
     Label(ban_screen, text="").pack()
     Button(ban_screen, text="Ban", width=10, height=1, command = ban_user).pack()
+    
+##
+## Ban function
+##
 
 def ban_user():
     isint = ban_time_entry.get()
@@ -285,7 +302,9 @@ def ban_user():
     else:
         Label(ban_screen, text=f"Time must be in integer form. Example: '1'", fg="red", font=("calibri", 11)).pack()
 
-
+##
+## Warn function
+##
 
 def warn_user():
     willbebanned = False
@@ -325,7 +344,10 @@ def warn_user():
         mycursor.execute(sql) 
         Label(warn_screen, text=f"User: {username_info} had too many warnings and is now banned for 7 days", fg="green", font=("calibri", 11)).pack()
 
-
+##
+## Warn screen
+##
+        
 def warn_screen():
     global warn_screen
     global cb2
@@ -360,7 +382,10 @@ def warn_screen():
     warn_reason_entry.pack()
     Label(warn_screen, text="").pack()
     Button(warn_screen, text="Warn", width=10, height=1, command = warn_user).pack()
-
+    
+##
+## Start screen
+##
 
 def main_account_screen():
     global main_screen
