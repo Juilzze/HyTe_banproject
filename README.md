@@ -2,7 +2,7 @@
 
 **HyTe_banproject**
 
-Hello, this is my school project which is simple ban control software made with Python (Tkinter) and MySQL. To setup this software you'll have to follow these simple steps. Lets begin!
+Hello, this is my school project which is super simple client-side ban control software made with Python (Tkinter) and MySQL. To setup this software you'll have to follow these simple steps. Lets begin!
 
 <h2>1.1</h2>
 
