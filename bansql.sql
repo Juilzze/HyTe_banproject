@@ -72,7 +72,7 @@ INSERT INTO `users` (`username`, `pass`, `admin`) VALUES
 
 -- Dumping structure for table bans_2022.warns
 CREATE TABLE IF NOT EXISTS `warns` (
-  `warnid` int(11) NOT NULL,
+  `warnid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(30) DEFAULT NULL,
   `reason` varchar(100) DEFAULT NULL,
   `date` varchar(100) DEFAULT NULL,
