@@ -9,8 +9,7 @@ from tkinter.ttk import Combobox
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
-    user="test",
-    password="test",
+    user="root",
     database="bans_2022"
 )
 
@@ -39,7 +38,7 @@ def register():
     key = StringVar()
     admincheck = IntVar()
 
-    Label(register_screen, text="Register", bg="white").pack()
+    Label(register_screen, text="Register").pack()
     Label(register_screen, text="").pack()
     username_lable = Label(register_screen, text="Username * ")
     username_lable.pack()
@@ -56,7 +55,7 @@ def register():
     admincheck_entry = Checkbutton(register_screen, text="Admin", variable=admincheck, onvalue=1, offvalue=0)
     admincheck_entry.pack()
     Label(register_screen, text="").pack()
-    Button(register_screen, text="Register", width=10, height=1, bg="green", command = 
+    Button(register_screen, text="Register", width=10, height=1, command = 
 register_user).pack()
 
 
@@ -70,19 +69,26 @@ def register_user():
     namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
     mycursor.execute(namecheck)
     myresult = mycursor.fetchall()
-    for x in myresult:
-        if username_info in x:
-            Label(register_screen, text=f"There is already user: {username_info}", fg="red", font=("calibri", 11)).pack()
 
-    for x in myresult:
-        if username_info not in x:
-            nextstep = True
-            
-    if nextstep == True or not myresult:
-        if key_info == "123":
-            sql = f"INSERT INTO users (username, pass, admin) VALUES ('{username_info}', '{password_info}', {admincheck_info})"
-            mycursor.execute(sql)
-            Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+    if len(username_info) >= 3 and len(password_info) >= 3:
+
+        for x in myresult:
+            if username_info in x:
+                Label(register_screen, text=f"There is already user: {username_info}", fg="red", font=("calibri", 11)).pack()
+    
+        for x in myresult:
+            if username_info not in x:
+                nextstep = True
+                
+        if nextstep == True or not myresult:
+            if key_info == "123":
+                sql = f"INSERT INTO users (username, pass, admin) VALUES ('{username_info}', '{password_info}', {admincheck_info})"
+                mycursor.execute(sql)
+                Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+            else:
+                Label(register_screen, text="Wrong key", fg="red", font=("calibri", 11)).pack()
+    else:
+        Label(register_screen, text="Your username or password is too short minium is 3 letter", fg="red", font=("calibri", 11)).pack()
             
 
 ##
@@ -133,14 +139,16 @@ def login_verify():
 
     if loginverify == True:
         login_sucess()
-        Label(login_screen, text="Login success", fg="green", font=("calibri", 11)).pack()
         main_screen.destroy()
-        isadmin = False
         admincheck = (f"SELECT admin FROM users WHERE users.username = '{username1}'")
         mycursor.execute(admincheck)
-        myresult3 = mycursor.fetchall()
-        admin_view()
-    elif logincode1 != True or logincode2 != True:
+        myresult2 = mycursor.fetchall()
+        for i in myresult2:
+            if 0 in i:
+                user_view()
+            elif 1 in i:
+                admin_view()
+    else:
         Label(login_screen, text="Login failed", fg="red", font=("calibri", 11)).pack()
 
 
@@ -196,7 +204,7 @@ def banlist():
     i=0 
     for bans in mycursor: 
         for j in range(len(bans)):
-            e = Entry(banlist, width=10, fg='blue') 
+            e = Entry(banlist, width=10) 
             e.grid(row=i, column=j) 
             e.insert(END, bans[j])
         i=i+1
@@ -209,7 +217,7 @@ def warnlist():
     i=0 
     for warns in mycursor: 
         for j in range(len(warns)):
-            e = Entry(warnlist, width=10, fg='blue') 
+            e = Entry(warnlist, width=10) 
             e.grid(row=i, column=j) 
             e.insert(END, warns[j])
         i=i+1
@@ -243,13 +251,11 @@ def ban_screen():
     myresult = mycursor.fetchall()
 
     Label(ban_screen, text="Username * ").pack()
-
     data=(myresult)
-    cb=Combobox(ban_screen, values=data, textvariable=var).pack()
-
-    lb=Listbox(ban_screen, height=5, selectmode='multiple')
-    for num in data:
-        lb.insert(END,num)
+    
+    cb=Combobox(ban_screen, values=data, width=30)
+    cb.current(0)
+    cb.pack()
 
     Label(ban_screen, text="").pack()
     Label(ban_screen, text="Time (days) *").pack()
@@ -260,15 +266,74 @@ def ban_screen():
     ban_reason_entry = Entry(ban_screen, textvariable=ban_reason)
     ban_reason_entry.pack()
     Label(ban_screen, text="").pack()
-    Button(ban_screen, text="Ban", width=10, height=1, command = selected_item).pack()
+    Button(ban_screen, text="Ban", width=10, height=1, command = ban_user).pack()
 
-def selected_item():
-    print(var.get())
-    print(lb.get())
-    print(cb.get())
+def ban_user():
+    isint = ban_time_entry.get()
+    if isint.isnumeric():
+        time_info = int(ban_time_entry.get())
+        reason_info = ban_reason_entry.get()
+        username_info = cb.get()
+        username = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
+        mycursor.execute(username)
+        myresult = mycursor.fetchall()
+        if myresult:
+            for i in myresult:
+                if username_info in i:
+                    Label(ban_screen, text=f"User: {username_info} has been banned", fg="green", font=("calibri", 11)).pack()
+                    today = date.today()
+                    enddate = today + timedelta(days=int(time_info))
+                    sql = f"INSERT INTO bans (username, reason, date, enddate) VALUES ('{username_info}', '{reason_info}', '{today}', '{enddate}')"
+                    mycursor.execute(sql) 
+        else:
+            Label(ban_screen, text=f"User: {username_info} not found ", fg="red", font=("calibri", 11)).pack()
+    else:
+        Label(ban_screen, text=f"Time must be in integer form. Example: '1'", fg="red", font=("calibri", 11)).pack()
+
+
+
+def warn_user():
+    willbebanned = False
+    reason_info = warn_reason_entry.get()
+    username_info = cb2.get()
+
+    x = 0
+    timeswarned = (f"SELECT username FROM warns WHERE warns.username = '{username_info}'")
+    mycursor.execute(timeswarned)
+    myresult2 = mycursor.fetchall()
+
+    if myresult2:
+        for i in myresult2:
+            x = x + 1
+            if x >= 3:
+                willbebanned = True
+
+    if willbebanned == False:
+        username = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
+        mycursor.execute(username)
+        myresult = mycursor.fetchall()
+    
+        if myresult:
+            for i in myresult:
+                if username_info in i:
+                    today = date.today()
+                    Label(warn_screen, text=f"User: {username_info} has been warned", fg="green", font=("calibri", 11)).pack()
+                    sql = f"INSERT INTO warns (username, reason, date) VALUES ('{username_info}', '{reason_info}', '{today}')"
+                    mycursor.execute(sql) 
+        else:
+            Label(warn_screen, text=f"User: {username_info} not found ", fg="red", font=("calibri", 11)).pack()
+    elif willbebanned == True:
+        today = date.today()
+        enddate = today + timedelta(days=7)
+        reason_info = "Too many warnings"
+        sql = f"INSERT INTO bans (username, reason, date, enddate) VALUES ('{username_info}', '{reason_info}', '{today}', '{enddate}')"
+        mycursor.execute(sql) 
+        Label(warn_screen, text=f"User: {username_info} had too many warnings and is now banned for 7 days", fg="green", font=("calibri", 11)).pack()
+
 
 def warn_screen():
     global warn_screen
+    global cb2
     warn_screen = Tk()
     warn_screen.title("Warn user")
     warn_screen.geometry("1920x1080")
@@ -282,9 +347,17 @@ def warn_screen():
     global username_warn_entry
     global warn_reason_entry
 
+    allusers = (f"SELECT users.username FROM users")
+    mycursor.execute(allusers)
+    myresult = mycursor.fetchall()
+
     Label(warn_screen, text="Username * ").pack()
-    username_warn_entry = Entry(warn_screen, textvariable=username_verify3)
-    username_warn_entry.pack()
+    data=(myresult)
+    
+    cb2=Combobox(warn_screen, values=data, width=30)
+    cb2.current(0)
+    cb2.pack()
+    
     Label(warn_screen, text="").pack()
     Label(warn_screen, text="Reason *").pack()
     warn_reason_entry = Entry(warn_screen, textvariable=warn_reason)
@@ -293,53 +366,12 @@ def warn_screen():
     Button(warn_screen, text="Warn", width=10, height=1, command = warn_user).pack()
 
 
-def ban_user():
-    nextstep = False
-    username_info = username_ban_entry.get()
-    time_info = int(ban_time_entry.get())
-    reason_info = ban_reason_entry.get()
-    
-    namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
-    mycursor.execute(namecheck)
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        if username_info in x:
-            Label(ban_screen, text=f"User: {username_info} has been banned", fg="red", font=("calibri", 11)).pack()
-            nextstep = True
-            
-    if nextstep == True:
-        today = date.today()
-        enddate = today + timedelta(days=int(time_info))
-        sql = f"INSERT INTO bans (username, reason, date, enddate) VALUES ('{username_info}', '{reason_info}', '{today}', '{enddate}')"
-        mycursor.execute(sql)
-        #Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
-
-def warn_user():
-    nextstep = False
-    username_info = username_warn_entry.get()
-    reason_info = warn_reason_entry.get()
-    
-    namecheck = (f"SELECT username FROM users WHERE users.username = '{username_info}'")
-    mycursor.execute(namecheck)
-    myresult = mycursor.fetchall()
-    for x in myresult:
-        if username_info in x:
-            Label(warn_screen, text=f"User: {username_info} has been warned", fg="red", font=("calibri", 11)).pack()
-            nextstep = True
-            
-    if nextstep == True:
-        today = date.today()
-        sql = f"INSERT INTO warns (username, reason, date) VALUES ('{username_info}', '{reason_info}', '{today}')"
-        print(sql)
-        mycursor.execute(sql)
-        #Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
-
 def main_account_screen():
     global main_screen
     main_screen = Tk()
     main_screen.geometry("1920x1080")
     main_screen.title("Login/Register")
-    Label(text="Login/Register", bg="blue", width="300", height="2", font=("Calibri", 13)).pack()
+    Label(text="Login/Register", width="300", height="2", font=("Calibri", 13)).pack()
     Label(text="").pack()
     Button(text="Login", height="2", width="30", command = login).pack()
     Label(text="").pack()
