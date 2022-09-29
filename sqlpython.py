@@ -9,7 +9,8 @@ from tkinter.ttk import Combobox
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
-    user="root",
+    user="test",
+    password="test",
     database="bans_2022"
 )
 
