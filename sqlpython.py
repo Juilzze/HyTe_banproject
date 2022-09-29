@@ -9,8 +9,7 @@ from tkinter.ttk import Combobox
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
-    user="test",
-    password="test",
+    user="root",
     database="bans_2022"
 )
 
@@ -24,6 +23,7 @@ mycursor = mydb.cursor()
 def register():
     global register_screen
     register_screen = Toplevel(main_screen)
+    register_screen.state('zoomed')
     register_screen.title("Register")
     register_screen.geometry("1920x1080")
 
@@ -101,6 +101,7 @@ def login():
     global login_screen
     login_screen = Toplevel(main_screen)
     login_screen.title("Login")
+    login_screen.state('zoomed')
     login_screen.geometry("1920x1080")
     Label(login_screen, text="Please enter details below to login").pack()
     Label(login_screen, text="").pack()
@@ -139,7 +140,6 @@ def login_verify():
             loginverify = True
 
     if loginverify == True:
-        login_sucess()
         main_screen.destroy()
         admincheck = (f"SELECT admin FROM users WHERE users.username = '{username1}'")
         mycursor.execute(admincheck)
@@ -153,18 +153,6 @@ def login_verify():
         Label(login_screen, text="Login failed", fg="red", font=("calibri", 11)).pack()
 
 
-def login_sucess():
-    global login_success_screen
-    login_success_screen = Toplevel(login_screen)
-    login_success_screen.title("Success")
-    login_success_screen.geometry("150x100")
-    Label(login_success_screen, text="Login success").pack()
-    Button(login_success_screen, text="OK", command=delete_login_success).pack()
-
-def delete_login_success():
-    login_success_screen.destroy()
-
-
 ##
 ## Tkinter screens
 ##
@@ -173,6 +161,7 @@ def delete_login_success():
 def user_view():
     global user_view
     user_view = Tk()
+    user_view.state('zoomed')
     user_view.geometry("1920x1080")
     user_view.title("Select")
     Label(text="Select", font=("Calibri", 13)).pack()
@@ -184,6 +173,7 @@ def user_view():
 def admin_view():
     global admin_view
     admin_view = Tk()
+    admin_view.state('zoomed')
     admin_view.geometry("1920x1080")
     admin_view.title("Select")
     Label(text="Select", font=("Calibri", 13)).pack()
@@ -199,7 +189,8 @@ def admin_view():
 
 def banlist():
     banlist = Tk()
-    banlist.geometry("400x250") 
+    banlist.state('zoomed')
+    banlist.geometry("1920x1080") 
 
     mycursor.execute("SELECT * FROM bans")
     i=0 
@@ -212,7 +203,8 @@ def banlist():
 
 def warnlist():
     warnlist = Tk()
-    warnlist.geometry("400x250") 
+    warnlist.state('zoomed')
+    warnlist.geometry("1920x1080") 
 
     mycursor.execute("SELECT * FROM warns")
     i=0 
@@ -227,6 +219,7 @@ def warnlist():
 def ban_screen():
     global ban_screen
     ban_screen = Tk()
+    ban_screen.state('zoomed')
     ban_screen.title("Ban user")
     ban_screen.geometry("1920x1080")
     Label(ban_screen, text="Enter ban details").pack()
@@ -336,6 +329,7 @@ def warn_screen():
     global warn_screen
     global cb2
     warn_screen = Tk()
+    warn_screen.state('zoomed')
     warn_screen.title("Warn user")
     warn_screen.geometry("1920x1080")
     Label(warn_screen, text="Enter warn details").pack()
@@ -370,6 +364,7 @@ def warn_screen():
 def main_account_screen():
     global main_screen
     main_screen = Tk()
+    main_screen.state('zoomed')
     main_screen.geometry("1920x1080")
     main_screen.title("Login/Register")
     Label(text="Login/Register", width="300", height="2", font=("Calibri", 13)).pack()
@@ -377,5 +372,6 @@ def main_account_screen():
     Button(text="Login", height="2", width="30", command = login).pack()
     Label(text="").pack()
     Button(text="Register", height="2", width="30", command=register).pack()
+    main_screen.mainloop()
 
 main_account_screen()
