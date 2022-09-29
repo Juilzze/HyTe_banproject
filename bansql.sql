@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `warns` (
   PRIMARY KEY (`warnid`) USING BTREE,
   KEY `username` (`username`),
   CONSTRAINT `warns_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table bans_2022.warns: ~1 rows (approximately)
 DELETE FROM `warns`;
